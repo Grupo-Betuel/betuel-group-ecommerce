@@ -10,7 +10,6 @@ import {
 import { IResponseError } from '@interfaces/error.interface';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { IPaginatedResponse } from '@interfaces/pagination.interface';
-import { keys } from 'lodash';
 import { deepMatch } from '../../utils/matching.util';
 import { extractContent } from '../../utils/objects.utils';
 
@@ -91,7 +90,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
       }
 
       if ((!cached || !(cached as any).length) || (data as IPaginatedResponse<T>).content) {
-        (data as IPaginatedResponse<T>).content = (cached || (data as IPaginatedResponse<T>).content) as any;
+        (data as IPaginatedResponse<T>).content = (cached
+          || (data as IPaginatedResponse<T>).content) as any;
         callback((data as T[]) || []);
       }
 

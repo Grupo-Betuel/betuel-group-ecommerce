@@ -270,10 +270,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import LoadingBar from 'react-top-loading-bar';
 import OrderService from '@services/orderService';
+import { ImageCacheProvider } from '@shared/contexts/ImageCacheContext';
 import { defaultTheme } from '../config/theme.config';
 import { defaultValidateMessages as validateMessages } from '../config/form-validation.config';
 import 'react-toastify/dist/ReactToastify.css';
-import { ImageCacheProvider } from '@shared/contexts/ImageCacheContext';
 
 // Dynamic imports
 const AppLayout = dynamic(() => import('@shared/layout'), { ssr: false });
@@ -283,7 +283,6 @@ export enum AppViewportHeightClassNames {
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',
 }
 
-
 export interface IAppProps {
   protected?: boolean;
 }
@@ -292,7 +291,8 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
   const clientEntity = useAppStore((state) => state.clients((s) => s));
   const productEntity = useAppStore((state) => state.products((s) => s));
   const [appLoading, setAppLoading] = useState<boolean>();
-  const [appViewportHeightClassName, setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
+  const [appViewportHeightClassName,
+    setAppViewportHeightClassName] = useState<AppViewportHeightClassNames>(
     AppViewportHeightClassNames.WITH_NAVBAR_OPTION,
   );
   const orderService = useMemo(() => new OrderService(), []);
@@ -414,7 +414,7 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
           <div className="loading">
             <Spin size="large" />
           </div>
-          
+
         )}
         <ImageCacheProvider>
           <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
