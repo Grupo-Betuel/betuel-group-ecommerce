@@ -283,6 +283,7 @@ export enum AppViewportHeightClassNames {
   WITH_NAVBAR_OPTION = 'FullAppViewPortHeightNavbarOptions',
 }
 
+
 export interface IAppProps {
   protected?: boolean;
 }
