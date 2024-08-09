@@ -53,7 +53,7 @@ export interface IProductParam {
   relatedParams?: IProductParam[]
 }
 export interface IProductSaleParam {
-  _id: string
+  _id?: string
   quantity?: number
   productQuantity?: number
   value?: string

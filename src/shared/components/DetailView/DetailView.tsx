@@ -7,8 +7,8 @@ import {
   List,
   Space,
   Spin,
-  Tag,
-} from 'antd';
+  Tag
+} from "antd";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -17,39 +17,40 @@ import {
   MessageOutlined,
   ShoppingOutlined,
   StarOutlined,
-  UploadOutlined, WhatsAppOutlined,
-} from '@ant-design/icons';
-import { useRouter } from 'next/router';
+  UploadOutlined, WhatsAppOutlined
+} from "@ant-design/icons";
+import { useRouter } from "next/router";
 import React, {
   createElement,
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
-} from 'react';
-import { handleEntityHook } from '@shared/hooks/handleEntityHook';
-import { Resizable } from 're-resizable';
-import { StickyFooter } from '@shared/layout/components/StickyFooter/StickyFooter';
-import { useContextualRouting } from 'next-use-contextual-routing';
-import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
-import { ImageBackground } from '@components/DetailView/components/ImageBackground/ImageBackground';
+  useState
+} from "react";
+import { handleEntityHook } from "@shared/hooks/handleEntityHook";
+import { Resizable } from "re-resizable";
+import { StickyFooter } from "@shared/layout/components/StickyFooter/StickyFooter";
+import { useContextualRouting } from "next-use-contextual-routing";
+import { EndpointsAndEntityStateKeys } from "@shared/enums/endpoints.enum";
+import { ImageBackground } from "@components/DetailView/components/ImageBackground/ImageBackground";
 import {
   IProductParam,
   IProductSaleParam,
-  ProductEntity,
-} from '@shared/entities/ProductEntity';
-import { ISale } from '@shared/entities/OrderEntity';
-import { structuredClone } from 'next/dist/compiled/@edge-runtime/primitives/structured-clone';
-import { useOrderContext } from '@shared/contexts/OrderContext';
-import { useAppStore } from '@services/store';
-import { ProductsConstants } from '@shared/constants/products.constants';
-import Link from 'next/link';
-import { sidebarWidth } from '../../../utils/layout.utils';
-import styles from './DetailView.module.scss';
-import { getSaleDataFromProduct } from '../../../utils/objects.utils';
-import { contactUsByWhatsappLink } from '../../../utils/url.utils';
-import { orderMessageTexts } from '../../../utils/constants/order.constant';
+  ProductEntity
+} from "@shared/entities/ProductEntity";
+import { ISale } from "@shared/entities/OrderEntity";
+import { structuredClone } from "next/dist/compiled/@edge-runtime/primitives/structured-clone";
+import { useOrderContext } from "@shared/contexts/OrderContext";
+import { useAppStore } from "@services/store";
+import { ProductsConstants } from "@shared/constants/products.constants";
+import Link from "next/link";
+import { sidebarWidth } from "../../../utils/layout.utils";
+import styles from "./DetailView.module.scss";
+import { getSaleDataFromProduct } from "../../../utils/objects.utils";
+import { contactUsByWhatsappLink } from "../../../utils/url.utils";
+import { orderMessageTexts } from "../../../utils/constants/order.constant";
+import DetailForm from "./DetailForm";
 
 export interface IDetailViewProps {
   productDetails?: any;
@@ -71,32 +72,33 @@ function IconText({ icon, text }: { icon: any; text: string }) {
 }
 
 const data = Array.from({ length: 23 }).map((_, i) => ({
-  href: 'https://ant.design',
+  href: "https://ant.design",
   title: `Juan Felipe ${i}`,
   avatar:
-    'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/cute-cat-photos-1593441022.jpg?crop=0.670xw:1.00xh;0.167xw,0&resize=640:*',
-  description: 'Revendedor | Tienda | Vendedor Oficial',
+    "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/cute-cat-photos-1593441022.jpg?crop=0.670xw:1.00xh;0.167xw,0&resize=640:*",
+  description: "Revendedor | Tienda | Vendedor Oficial",
   content:
-    'Me Encanto la tabla de surf que compre, de muy buena calidad, excelente servicios',
+    "Me Encanto la tabla de surf que compre, de muy buena calidad, excelente servicios"
 }));
 
-const controlNamePrefix = 'quantity-';
+const controlNamePrefix = "quantity-";
 const maxDescriptionLength = 70;
+
 export function DetailView({
-  productDetails,
-  returnHref,
-  productId,
-  companyLogo,
-  forceLoadProduct,
-  goBack,
-}: IDetailViewProps) {
+                             productDetails,
+                             returnHref,
+                             productId,
+                             companyLogo,
+                             forceLoadProduct,
+                             goBack
+                           }: IDetailViewProps) {
   const [product, setProduct] = useState<ProductEntity>({} as ProductEntity);
   const [oldSale, setOldSale] = useState<Partial<ISale>>({} as ISale);
   const [sale, setSale] = useState<Partial<ISale>>({} as ISale);
   const [showMoreDescription, setShowMoreDescription] = useState(false);
   const router = useRouter();
   const carouselRef = useRef<any>();
-  const { fetching, get, item } = handleEntityHook<ProductEntity>('products');
+  const { fetching, get, item } = handleEntityHook<ProductEntity>("products");
   const { makeContextualHref } = useContextualRouting();
   const [productOptionsForm] = Form.useForm();
   const { orderService } = useOrderContext();
@@ -121,19 +123,19 @@ export function DetailView({
   useEffect(() => {
     if (product._id && currentOrder) {
       const savedSale = currentOrder.sales.find(
-        (s) => s.product._id === product._id,
+        (s) => s.product._id === product._id
       );
       if (savedSale && product?.productParams?.length !== savedSale?.params?.length) {
         product.productParams.forEach((productParam) => {
           const saleParamIndex = savedSale?.params.findIndex(
-            (saleParam) => saleParam.productParam === productParam._id,
+            (saleParam) => saleParam.productParam === productParam._id
           );
 
           if (saleParamIndex && saleParamIndex !== -1 && !!savedSale?.params) {
             const saleParamData = savedSale.params[saleParamIndex];
             const param = parseProductParamToSaleParams(
               productParam,
-              saleParamData as IProductSaleParam,
+              saleParamData as IProductSaleParam
             );
             savedSale.params[saleParamIndex] = param;
           }
@@ -142,7 +144,7 @@ export function DetailView({
 
       setSale({
         ...getSaleDataFromProduct(product),
-        ...savedSale,
+        ...savedSale
       });
       // savedSale?.params.forEach((param) => handleSaleProductParams(param)());
     }
@@ -153,32 +155,32 @@ export function DetailView({
     };
 
     // Event listener for beforeHistoryChange
-    router.events.on('beforeHistoryChange', handleBeforeHistoryChange);
+    router.events.on("beforeHistoryChange", handleBeforeHistoryChange);
 
     // Clean up the event listener when the component is unmounted
     return () => {
-      router.events.off('beforeHistoryChange', handleBeforeHistoryChange);
+      router.events.off("beforeHistoryChange", handleBeforeHistoryChange);
     };
   }, [router.events]);
 
   const handleEscKeyPress = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       back();
     }
   };
 
   useEffect(() => {
     // Attach the event listener when the component mounts
-    document.addEventListener('keydown', handleEscKeyPress);
+    document.addEventListener("keydown", handleEscKeyPress);
     // Detach the event listener when the component unmounts
     return () => {
-      document.removeEventListener('keydown', handleEscKeyPress);
+      document.removeEventListener("keydown", handleEscKeyPress);
     };
   }, []); // Empty dependency array ensures the effect runs once on mount and cleans up on unmount
 
   const productExistOnShoppingCart = useMemo(
     () => !!orderService?.getSaleByProductId(product._id),
-    [orderService?.localOrder, sale.params],
+    [orderService?.localOrder, sale.params]
   );
 
   const back = () => {
@@ -188,11 +190,11 @@ export function DetailView({
     }
     if (returnHref) {
       router.push(
-        makeContextualHref({ return: true, productId: '' }),
+        makeContextualHref({ return: true, productId: "" }),
         returnHref,
         {
-          shallow: true,
-        },
+          shallow: true
+        }
       );
     } else {
       if (!product?.company) return;
@@ -200,13 +202,13 @@ export function DetailView({
     }
   };
 
-  const navigate = (to: 'prev' | 'next') => () => carouselRef.current && carouselRef.current[to]();
+  const navigate = (to: "prev" | "next") => () => carouselRef.current && carouselRef.current[to]();
   const hasImages = product.images && !!product.images.length;
   const hasMultipleImages = hasImages && product.images.length > 1;
 
   const parseProductParamToSaleParams = (
     productParam: IProductParam,
-    saleParam: Partial<IProductSaleParam>,
+    saleParam: Partial<IProductSaleParam>
   ) => {
     const relatedParamsData = productParam.relatedParams?.map((item) => {
       const newRelParam = ({
@@ -214,10 +216,10 @@ export function DetailView({
         _id: undefined,
         productParam: item._id,
         productQuantity: item.quantity,
-        quantity: 0,
+        quantity: 0
       });
       const existingRelParam = saleParam.relatedParams?.find(
-        (relParam) => relParam.productParam === item._id,
+        (relParam) => relParam.productParam === item._id
       );
       return existingRelParam || newRelParam;
     });
@@ -238,7 +240,7 @@ export function DetailView({
       quantity: 0,
       productParam: productParam._id,
       ...saleParam,
-      relatedParams,
+      relatedParams
     };
 
     return param;
@@ -251,12 +253,12 @@ export function DetailView({
 
     const param = parseProductParamToSaleParams(productParam as IProductParam, saleParam);
     const exist = sale?.params?.find(
-      (p) => p.productParam === param.productParam,
+      (p) => p.productParam === param.productParam
     );
     let newParams: IProductSaleParam[] | undefined = [];
     if (exist) {
       newParams = sale?.params?.filter(
-        (p) => p.productParam !== param.productParam,
+        (p) => p.productParam !== param.productParam
       );
       // setSale({ ...sale, params: newParams });
     } else {
@@ -270,7 +272,7 @@ export function DetailView({
     const quantity = Number(value || 0);
     const newSale: Partial<ISale> = {
       ...structuredClone(sale),
-      quantity,
+      quantity
     };
     if (quantity <= product.stock) {
       if (quantity > 0 && productExistOnShoppingCart) {
@@ -287,7 +289,7 @@ export function DetailView({
 
   const handleSaleProductParamsChange = (
     parentId: string,
-    variantId?: string,
+    variantId?: string
   ) => async (value?: any) => {
     let newSale = structuredClone(sale);
     let total = 0;
@@ -303,16 +305,16 @@ export function DetailView({
     }
 
     const variant = saleParam?.relatedParams?.find(
-      (v) => v.productParam === variantId,
+      (v) => v.productParam === variantId
     );
     if (variant) {
       variant.quantity = quantity;
       total = saleParam?.relatedParams?.reduce(
         (acc, v) => acc + (v.quantity || 0),
-        0,
+        0
       ) || 0;
       saleParam.relatedParams = saleParam?.relatedParams?.map(
-        (v) => (variant.productParam === v.productParam ? variant : v),
+        (v) => (variant.productParam === v.productParam ? variant : v)
       );
     } else {
       total = quantity;
@@ -328,14 +330,14 @@ export function DetailView({
       }) as IProductParam[];
       newSale = {
         ...newSale,
-        params: newParams.filter((item: IProductSaleParam) => !!item),
+        params: newParams.filter((item: IProductSaleParam) => !!item)
       };
     } else {
       const newParams = [...(newSale?.params || [])];
       newParams.push(saleParam);
       newSale = {
         ...newSale,
-        params: newParams,
+        params: newParams
       };
     }
 
@@ -348,13 +350,13 @@ export function DetailView({
       .validateFields([controlName])
       .then(
         () => true,
-        () => false,
+        () => false
       );
     if (controlIsValid) {
       if (saleTotal > 0) {
         if (quantity <= 0) {
           newSale.params = newSale?.params?.filter(
-            (item) => item._id !== parentId,
+            (item) => item._id !== parentId
           );
         }
         // if the order exist just
@@ -384,9 +386,9 @@ export function DetailView({
 
   const maxQuantityError = useCallback(
     (quantity: number = 0) => (!quantity
-      ? 'No quedan unidades disponibles'
+      ? "No quedan unidades disponibles"
       : `Solo quedan ${quantity} unidades`),
-    [],
+    []
   );
 
   useEffect(() => {
@@ -426,18 +428,18 @@ export function DetailView({
     () => (productExistOnShoppingCart
       ? saleNeedUpdate ? ProductsConstants.UPDATE_ORDER_IN_CART : ProductsConstants.VIEW_CART
       : ProductsConstants.ADD_CART),
-    [productExistOnShoppingCart, saleNeedUpdate],
+    [productExistOnShoppingCart, saleNeedUpdate]
   );
 
   const shoppingActionDisabled = useMemo(
     () => (!sale?.quantity && !productExistOnShoppingCart)
       || (sale?.quantity || 0) > product.stock,
-    [productExistOnShoppingCart, sale, product],
+    [productExistOnShoppingCart, sale, product]
   );
 
   const getWhatsappLink = useCallback(
     (p: ProductEntity) => contactUsByWhatsappLink(orderMessageTexts.orderItemByWhatsapp(p)),
-    [],
+    []
   );
 
   const ShoppingActionButton = (
@@ -454,6 +456,47 @@ export function DetailView({
       {shoppingActionText}
     </Button>
   );
+
+  // // Efecto para cargar los detalles del producto
+  // useEffect(() => {
+  //   if (productDetails) {
+  //     setProduct(productDetails);
+  //   }
+  // }, [productDetails]);
+
+  // Maneja la adición de parámetros de venta
+  const handleAddToSale = (saleParam: IProductSaleParam) => {
+    const exist = sale?.params?.find(
+      (p) => p.productParam === saleParam.productParam
+    );
+
+    let newParams: IProductSaleParam[] | undefined = [];
+    if (exist) {
+      newParams = sale?.params?.map((p) =>
+        p.productParam === saleParam.productParam ? saleParam : p
+      );
+    } else {
+      newParams = [...(sale?.params || []), saleParam];
+    }
+
+    const saleTotal = newParams?.reduce((acc, p) => acc + (p.quantity || 0), 0);
+
+    setSale({ ...sale, params: newParams, quantity: saleTotal });
+  };
+
+  // Maneja la eliminación de parámetros de venta
+  // const handleRemoveFromSale = (parentId: string, variantId?: string) => {
+  //   const newParams = sale?.params?.filter(
+  //     (item) =>
+  //       item.productParam !== parentId ||
+  //       (variantId && item.relatedParams?.find((v) => v.productParam !== variantId))
+  //   );
+  //
+  //   const saleTotal = newParams?.reduce((acc, p) => acc + (p.quantity || 0), 0);
+  //
+  //   setSale({ ...sale, params: newParams, quantity: saleTotal });
+  // };
+
   return (
     <>
       <div className={`grid-container ${styles.DetailViewWrapper}`}>
@@ -467,10 +510,10 @@ export function DetailView({
           {hasMultipleImages && (
             <>
               <div className={styles.DetailViewPrevButton}>
-                <ArrowLeftOutlined rev="" onClick={navigate('prev')} />
+                <ArrowLeftOutlined rev="" onClick={navigate("prev")} />
               </div>
               <div className={styles.DetailViewNextButton}>
-                <ArrowRightOutlined rev="" onClick={navigate('next')} />
+                <ArrowRightOutlined rev="" onClick={navigate("next")} />
               </div>
             </>
           )}
@@ -495,7 +538,7 @@ export function DetailView({
           {/* </Image.PreviewGroup> */}
         </div>
         <Resizable
-          defaultSize={{ width: sidebarWidth, height: 'auto' }}
+          defaultSize={{ width: sidebarWidth, height: "auto" }}
           enable={{ left: true, right: false }}
           className={styles.DetailViewPostDetails}
         >
@@ -503,17 +546,20 @@ export function DetailView({
             <h1 className="title m-0">{product.name}</h1>
             <h2 className="subtitle m-0">
               RD$
-              {' '}
+              {" "}
               {product.price?.toLocaleString()}
             </h2>
             <span className="label">
               {product.stock}
-              {' '}
+              {" "}
               unidades disponibles
             </span>
           </div>
           <div className={styles.DetailViewPostDetailsContent}>
             <span className="subtitle mb-m">Escoge las Cantidades</span>
+
+
+
             <Form
               form={productOptionsForm}
               name="productOptionsForm"
@@ -522,7 +568,7 @@ export function DetailView({
               {product?.productParams && product?.productParams.length ? (
                 product?.productParams?.map((param, i) => {
                   const isActive = sale?.params?.find(
-                    (saleParam) => saleParam.productParam === param._id,
+                    (saleParam) => saleParam.productParam === param._id
                   );
                   return (
                     <div
@@ -531,9 +577,9 @@ export function DetailView({
                       } ${
                         isActive
                           ? `${styles.active} ${
-                            param.relatedParams?.length ? ' w-100' : ''
+                            param.relatedParams?.length ? " w-100" : ""
                           }`
-                          : ''
+                          : ""
                       }`}
                       key={`detailViewOption${i}`}
                     >
@@ -544,7 +590,7 @@ export function DetailView({
                         onClick={handleSaleProductParams(param)}
                       >
                         {param.label}
-                        {param.type === 'color' ? (
+                        {param.type === "color" ? (
                           <span
                             className={
                               styles.DetailViewPostDetailsContentOptionBtnColorOption
@@ -558,107 +604,114 @@ export function DetailView({
                       {isActive
                       && param?.relatedParams
                       && !!param?.relatedParams.length ? (
-                        <div
+                        <DetailForm
+                          param={param}
+                          saleParams={sale.params || []}
+                          controlNamePrefix={`productOption_${param._id}_`}
+                          handleSaleProductParamsChange={handleSaleProductParamsChange}
+                          onRemoveFromSale={resetSaleProductParam}
+                        />
+                        // <div
+                        //   className={
+                        //     styles.DetailViewPostDetailsContentOptionVariants
+                        //   }
+                        // >
+                        //   {param.relatedParams?.map((variant, i) => (
+                        //     <div
+                        //       className={
+                        //         styles.DetailViewPostDetailsContentOptionVariantsItem
+                        //       }
+                        //       key={`detailViewOptionVariant${i}`}
+                        //     >
+                        //       <Tag
+                        //         className={
+                        //           styles.DetailViewPostDetailsContentOptionVariantsItemTag
+                        //         }
+                        //       >
+                        //         {variant.label}
+                        //         {" "}
+                        //         -
+                        //         {variant.value}
+                        //       </Tag>
+                        //       <Form.Item
+                        //         className={
+                        //           styles.DetailViewPostDetailsContentOptionVariantsItemInput
+                        //         }
+                        //         name={`${controlNamePrefix}${variant._id}`}
+                        //         rules={[
+                        //           {
+                        //             type: "number",
+                        //             required: true,
+                        //             message: maxQuantityError(variant.quantity),
+                        //             max: variant.quantity,
+                        //             min: 0
+                        //           }
+                        //         ]}
+                        //       >
+                        //         <InputNumber
+                        //           onWheel={(e) => e.currentTarget.blur()}
+                        //           type="number"
+                        //           placeholder="Cantidad"
+                        //           value={getQuantityValue(
+                        //             param._id,
+                        //             variant._id
+                        //           )}
+                        //           defaultValue={0}
+                        //           onChange={handleSaleProductParamsChange(
+                        //             param._id,
+                        //             variant._id
+                        //           )}
+                        //           addonAfter={(
+                        //             <CloseOutlined
+                        //               rev=""
+                        //               onClick={resetSaleProductParam(
+                        //                 param._id,
+                        //                 variant._id
+                        //               )}
+                        //             />
+                        //           )}
+                        //           min={0}
+                        //         />
+                        //       </Form.Item>
+                        //     </div>
+                        //   ))}
+                        // </div>
+                      ) : (
+                        <Form.Item
                           className={
-                            styles.DetailViewPostDetailsContentOptionVariants
-                          }
-                        >
-                          {param.relatedParams?.map((variant, i) => (
-                            <div
-                              className={
-                                styles.DetailViewPostDetailsContentOptionVariantsItem
-                              }
-                              key={`detailViewOptionVariant${i}`}
-                            >
-                              <Tag
-                                className={
-                                  styles.DetailViewPostDetailsContentOptionVariantsItemTag
-                                }
-                              >
-                                {variant.label}
-                                {' '}
-                                -
-                                {variant.value}
-                              </Tag>
-                              <Form.Item
-                                className={
-                                  styles.DetailViewPostDetailsContentOptionVariantsItemInput
-                                }
-                                name={`${controlNamePrefix}${variant._id}`}
-                                rules={[
-                                  {
-                                    type: 'number',
-                                    required: true,
-                                    message: maxQuantityError(variant.quantity),
-                                    max: variant.quantity,
-                                    min: 0,
-                                  },
-                                ]}
-                              >
-                                <InputNumber
-                                  onWheel={(e) => e.currentTarget.blur()}
-                                  type="number"
-                                  placeholder="Cantidad"
-                                  value={getQuantityValue(
-                                    param._id,
-                                    variant._id,
-                                  )}
-                                  defaultValue={0}
-                                  onChange={handleSaleProductParamsChange(
-                                    param._id,
-                                    variant._id,
-                                  )}
-                                  addonAfter={(
-                                    <CloseOutlined
-                                      rev=""
-                                      onClick={resetSaleProductParam(
-                                        param._id,
-                                        variant._id,
-                                      )}
-                                    />
-                                  )}
-                                  min={0}
-                                />
-                              </Form.Item>
-                            </div>
-                          ))}
-                        </div>
-                        ) : (
-                          <Form.Item
-                            className={
                             styles.DetailViewPostDetailsContentOptionBtnInput
                           }
-                            name={`${controlNamePrefix}${param._id}`}
-                            rules={[
-                              {
-                                type: 'number',
-                                required: true,
-                                message: maxQuantityError(param.quantity),
-                                max: param.quantity,
-                                min: 0,
-                              },
-                            ]}
-                          >
-                            <InputNumber
-                              onWheel={(e) => e.currentTarget.blur()}
-                              type="number"
-                              className={
+                          name={`${controlNamePrefix}${param._id}`}
+                          rules={[
+                            {
+                              type: "number",
+                              required: true,
+                              message: maxQuantityError(param.quantity),
+                              max: param.quantity,
+                              min: 0
+                            }
+                          ]}
+                        >
+                          <InputNumber
+                            onWheel={(e) => e.currentTarget.blur()}
+                            type="number"
+                            className={
                               styles.DetailViewPostDetailsContentOptionQuantity
                             }
-                              placeholder="Cantidad"
-                              onChange={handleSaleProductParamsChange(param._id)}
-                              value={getQuantityValue(param._id)}
-                              defaultValue={0}
-                              min={0}
-                              addonAfter={(
-                                <CloseOutlined
-                                  rev=""
-                                  onClick={resetSaleProductParam(param._id)}
-                                />
+                            placeholder="Cantidad"
+                            onChange={handleSaleProductParamsChange(param._id)}
+                            value={getQuantityValue(param._id)}
+                            defaultValue={0}
+                            min={0}
+                            addonAfter={(
+                              <CloseOutlined
+                                rev=""
+                                onClick={resetSaleProductParam(param._id)}
+                              />
                             )}
-                            />
-                          </Form.Item>
-                        )}
+                          />
+                        </Form.Item>
+                      )}
                     </div>
                   );
                 })
@@ -668,12 +721,12 @@ export function DetailView({
                   name="quantity"
                   rules={[
                     {
-                      type: 'number',
+                      type: "number",
                       required: true,
                       message: maxQuantityError(product.stock),
                       max: product.stock,
-                      min: 0,
-                    },
+                      min: 0
+                    }
                   ]}
                 >
                   <InputNumber
@@ -693,13 +746,15 @@ export function DetailView({
                 </Form.Item>
               )}
             </Form>
+
+
             <div
               className={styles.DetailViewPostDetailsContentDescriptionWrapper}
             >
               <h2 className="subtitle">Descripcion</h2>
               <div
                 className={`${styles.DetailViewPostDetailsContentDescription} ${
-                  showMoreDescription ? styles.showMoreDescription : ''
+                  showMoreDescription ? styles.showMoreDescription : ""
                 }`}
                 dangerouslySetInnerHTML={{ __html: product.description }}
               />
@@ -710,14 +765,14 @@ export function DetailView({
                   }
                   onClick={() => setShowMoreDescription(!showMoreDescription)}
                 >
-                  {!showMoreDescription ? 'Mostrar mas' : 'Mostrar menos'}
+                  {!showMoreDescription ? "Mostrar mas" : "Mostrar menos"}
                 </a>
               )}
             </div>
 
             <div
               className={styles.DetailViewPostDetailsContentComments}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
             >
               <span className="subtitle mb-xx-s">Comentarios</span>
               <div className="flex-between-center p-m gap-s">
@@ -734,7 +789,7 @@ export function DetailView({
                 footer={(
                   <div>
                     <b>ant design</b>
-                    {' '}
+                    {" "}
                     footer part
                   </div>
                 )}
@@ -756,7 +811,7 @@ export function DetailView({
                         icon={MessageOutlined}
                         text="2"
                         key="list-vertical-message"
-                      />,
+                      />
                     ]}
                   >
                     <List.Item.Meta
@@ -772,7 +827,7 @@ export function DetailView({
           </div>
           <StickyFooter className={styles.DetailViewPostDetailsActions}>
             {ShoppingActionButton}
-            { !currentOrder?.sales?.length && (
+            {!currentOrder?.sales?.length && (
               <Link href={getWhatsappLink(product)}>
                 <a target="_blank" rel="noopener noreferrer">
                   <Button
