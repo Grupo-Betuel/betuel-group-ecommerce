@@ -49,7 +49,6 @@ export function Category() {
     setCategoryProducts([...results]);
   };
 
-  console.log('cat', categoryProducts);
   return (
     <>
       {(loading || (!categoryProducts.length && !searchValue)) && (
