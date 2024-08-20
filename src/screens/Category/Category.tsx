@@ -51,11 +51,11 @@ export function Category() {
 
   return (
     <>
-      {(loading || (!categoryProducts.length && !searchValue)) && (
-      <div className="loading">
-        <Spin size="large" />
-      </div>
-      )}
+      {/* {(loading || (!categoryProducts.length && !searchValue)) && ( */}
+      {/* <div className="loading"> */}
+      {/*  <Spin size="large" /> */}
+      {/* </div> */}
+      {/* )} */}
       <div className={styles.CategoryWrapper}>
         {ProductDetail}
         <div className={styles.CategoryContent}>
@@ -66,15 +66,15 @@ export function Category() {
           >
             <div>
               <div className={styles.CategorySearchWrapper}>
-                {/* <Input */}
-                {/*  value={searchValue} */}
-                {/*  className={styles.CategoryInputSearch} */}
-                {/*  placeholder="Buscar" */}
-                {/*  suffix={<SearchOutlined rev="" className="site-form-item-icon" />} */}
-                {/*  bordered={false} */}
-                {/*  onChange={onSearch} */}
-                {/*  size="large" */}
-                {/* /> */}
+                <Input
+                  value={searchValue}
+                  className={styles.CategoryInputSearch}
+                  placeholder="Buscar"
+                  suffix={<SearchOutlined rev="" className="site-form-item-icon" />}
+                  bordered={false}
+                  onChange={onSearch}
+                  size="large"
+                />
               </div>
               {!categoryProducts?.length && (
                 <h2 className="p-xx-l">No hay resultados!</h2>
