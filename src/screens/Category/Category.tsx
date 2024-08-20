@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/router';
-import { Affix, Input, Spin } from 'antd';
+import { Affix, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import dynamic from 'next/dynamic';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
