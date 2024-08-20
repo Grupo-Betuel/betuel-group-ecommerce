@@ -20,7 +20,7 @@ export function Category() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState<string>();
   const [categoryProducts, setCategoryProducts] = useState<ProductEntity[]>([]);
-  const { loading, get: getProducts, [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData } = handleEntityHook<ProductEntity>('products');
+  const { get: getProducts, [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData } = handleEntityHook<ProductEntity>('products');
   const { goToProductDetail, ProductDetail } = showProductDetailsHook();
   const { cacheImage } = useImageCache();
 
