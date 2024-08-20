@@ -163,6 +163,7 @@ export function handleEntityHook<T>(
 
   useEffect(() => {
     entityDataRef.current = getAllEntityData();
+    console.log('entityDataRef.current', entityDataRef.current);
   }, [entity.data]);
 
   const { data, pagination } = divideDataAndPagination('content');

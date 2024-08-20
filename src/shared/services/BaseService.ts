@@ -90,8 +90,8 @@ export class BaseService<T> implements AbstractBaseService<T> {
       }
 
       if ((!cached || !(cached as any).length) || (data as IPaginatedResponse<T>).content) {
-        (data as IPaginatedResponse<T>).content = (cached
-          || (data as IPaginatedResponse<T>).content) as any;
+        (data as IPaginatedResponse<T>).content = ((cached as any)?.length ? cached
+          : (data as IPaginatedResponse<T>).content) as any;
         callback((data as T[]) || []);
       }
 
