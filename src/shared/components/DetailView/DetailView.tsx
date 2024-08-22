@@ -574,7 +574,7 @@ export function DetailView({
                     <div
                       className={`${
                         styles.DetailViewPostDetailsContentOption
-                      } ${
+                      } w-100 ${
                         isActive
                           ? `${styles.active} ${
                             param.relatedParams?.length ? " w-100" : ""
