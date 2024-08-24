@@ -4,7 +4,6 @@ import {
   DrawerProps,
   Modal,
   Result,
-  Spin,
   Steps,
   Tag,
 } from 'antd';
@@ -50,7 +49,7 @@ export function ShoppingCartDrawer({
   const router = useRouter();
   const order = useAppStore((state) => state.currentOrder);
   const handleCurrentOrder = useAppStore((state) => state.handleCurrentOrder);
-  const { appLoading } = useContext(AppLoadingContext);
+  const { setAppLoading } = useContext(AppLoadingContext);
 
   const { client } = useAuthClientHook();
   const {
@@ -103,13 +102,16 @@ export function ShoppingCartDrawer({
       if (orderData.status === 'pending-confirm') {
         orderData.status = 'pending-info';
       }
-      await updateOrder(orderData);
+      // eager closing
       onClose && onClose();
+      await updateOrder(orderData);
       toast.success('Orden actualizada con éxito');
       orderService.resetLocalStorageOrder();
     } else if ((client || (newClient && current === 1)) && !orderData._id) {
       const clientData = newClient?._id ? newClient : client;
       const from = (localStorage.getItem(FROM_TARGET_KEY) || 'ecommerce') as OrderFromTypes;
+      // eager closing
+      onClose && onClose();
       await sendOrder({ ...orderData, from, client: clientData });
       if (from) {
         localStorage.removeItem(FROM_TARGET_KEY);
@@ -122,6 +124,8 @@ export function ShoppingCartDrawer({
     } else if (!client) {
       next();
     }
+
+    setAppLoading(false);
   };
   const onChangeStep = (value: number) => {
     setCurrent(value);
@@ -187,6 +191,10 @@ export function ShoppingCartDrawer({
     });
   };
 
+  useEffect(() => {
+    setAppLoading(loading);
+  }, [loading]);
+
   return (
     <Drawer
       open={open}
@@ -194,11 +202,6 @@ export function ShoppingCartDrawer({
       bodyStyle={{ paddingBottom: 0, paddingTop: 0 }}
       className={styles.ShoppingCartDrawer}
     >
-      {(loading || appLoading) && (
-        <div className="loading">
-          <Spin size="large" />
-        </div>
-      )}
       <div className={styles.ShoppingCartDrawerHeader}>
         {!client ? (
           <Steps

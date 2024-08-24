@@ -63,7 +63,7 @@ export function Register({ isModal, onSubmit, submitBtnLabel }: IAuthProps) {
     if (!response) {
       handleUnsuccessfulLogin();
     } else {
-      setFailedLogin(false);
+      // setFailedLogin(false);
       setLogged(true);
       if (isModal) {
         router.back();

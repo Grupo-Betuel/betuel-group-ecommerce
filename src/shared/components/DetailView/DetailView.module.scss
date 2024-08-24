@@ -136,8 +136,11 @@ $bannerHeight: 40px;
     }
 
     .DetailViewPostDetailsContent {
+      //min-height: calc(100dvh - 100px);
+      //height: auto;
       .DetailViewPostDetailsContentOptionsWrapper {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 1rem;
         flex-wrap: wrap;
         width: 100%;
@@ -153,6 +156,9 @@ $bannerHeight: 40px;
             align-items: center;
             justify-content: center;
             gap: size.$size-small;
+            width: 100%;
+            height: 50px;
+            white-space: break-spaces;
             //font-size: 1.1rem;
             //width: auto !important;
 
@@ -162,6 +168,7 @@ $bannerHeight: 40px;
               display: block;
               width: size.$size-large;
               height: size.$size-large;
+
             }
           }
           .DetailViewPostDetailsContentOptionBtnInput input {

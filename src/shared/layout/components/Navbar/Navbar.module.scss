@@ -56,6 +56,9 @@
     }
     .navbarLogoContainer {
       display: flex;
+      @include breakpoints.only-on(('m', 'xs')) {
+        padding-left: 30px;
+      }
       .navbarLogo {
         height: layout.$navbarOptionsHeight - 15px !important;
         display: block;

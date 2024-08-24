@@ -1,4 +1,6 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, {
+  useEffect, useState, ChangeEvent, useContext,
+} from 'react';
 import { useRouter } from 'next/router';
 import { Affix, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -8,6 +10,7 @@ import { ProductEntity } from '@shared/entities/ProductEntity';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import { useImageCache } from '@shared/contexts/ImageCacheContext';
+import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { layoutId, navbarOptionsHeight, topbarOptionsHeight } from '../../utils/layout.utils';
 import styles from './Category.module.scss';
 
@@ -20,7 +23,7 @@ export function Category() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState<string>();
   const [categoryProducts, setCategoryProducts] = useState<ProductEntity[]>([]);
-  const { get: getProducts, [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData } = handleEntityHook<ProductEntity>('products');
+  const { loading, get: getProducts, [EndpointsAndEntityStateKeys.BY_CATEGORY]: categoryProductsData } = handleEntityHook<ProductEntity>('products');
   const { goToProductDetail, ProductDetail } = showProductDetailsHook();
   const { cacheImage } = useImageCache();
 
@@ -48,14 +51,15 @@ export function Category() {
     const results = deepMatch<ProductEntity>(value, categoryProductsData?.data || []);
     setCategoryProducts([...results]);
   };
+  const { setAppLoading } = useContext(AppLoadingContext);
+
+  useEffect(() => {
+    const val = (loading || (!categoryProducts.length && !searchValue));
+    setAppLoading(val);
+  }, [loading, categoryProducts.length, searchValue]);
 
   return (
     <>
-      {/* {(loading || (!categoryProducts.length && !searchValue)) && ( */}
-      {/* <div className="loading"> */}
-      {/*  <Spin size="large" /> */}
-      {/* </div> */}
-      {/* )} */}
       <div className={styles.CategoryWrapper}>
         {ProductDetail}
         <div className={styles.CategoryContent}>

@@ -5,7 +5,7 @@ export const ProductsConstants = {
   ONLY_X_QUANTITY: (q: number) => `Solo quedan ${q} unidades.`,
   ALMOST_SOLD_OUT_QUANTITY: 5,
   ADD_CART: 'Agregar al pedido',
-  VIEW_CART: 'Ver Pedido',
+  VIEW_CART: 'Enviar Pedido',
   ORDER_BY_WHATSAPP: 'Pedir por Whatsapp',
   UPDATE_ORDER_IN_CART: 'Ir a Actualizar Pedido',
   UPDATE_CART: 'Atualizar Pedido',

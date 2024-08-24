@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {
-  Space, Table, Tag, Modal, Button, Spin,
+  Space, Table, Tag, Modal, Button,
 } from 'antd';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
@@ -17,7 +17,6 @@ export default function ClientOrders() {
   const {
     get: getOrders,
     update: updateOrder,
-    fetching,
     [EndpointsAndEntityStateKeys.BY_CLIENT]: clientOrders,
   } = handleEntityHook<OrderEntity>('orders');
   const { client } = useAuthClientHook();
@@ -144,11 +143,6 @@ export default function ClientOrders() {
 
   return (
     <>
-      {fetching && (
-        <div className="loading">
-          <Spin size="large" />
-        </div>
-      )}
       <div className="p-xxx-l w-100">
         <h2 className="title">Mis Ordenes</h2>
         <Table columns={columns} dataSource={clientOrders?.data || []} />
