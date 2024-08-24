@@ -45,12 +45,14 @@ import { useAppStore } from '@services/store';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import Link from 'next/link';
 import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
+import {
+  ProductOptionHandler,
+} from '@components/DetailView/components/ProductOptionHandler/ProductOptionHandler';
 import { sidebarWidth } from '../../../utils/layout.utils';
 import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
 import { contactUsByWhatsappLink } from '../../../utils/url.utils';
 import { orderMessageTexts } from '../../../utils/constants/order.constant';
-import ProductOptionHandler from './components/ProductOptionHandler/ProductOptionHandler';
 
 const { confirm } = Modal;
 
