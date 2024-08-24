@@ -7,7 +7,7 @@ import {
   CloseOutlined,
   DatabaseOutlined,
   DownOutlined,
-  HomeOutlined,
+  HomeOutlined, MenuOutlined,
   ShoppingOutlined,
 } from '@ant-design/icons';
 import { HandleAuthVisibility } from '@shared/components';
@@ -167,7 +167,7 @@ export default function Navbar() {
           >
             <Link href="/">
               <a className="text-black d-flex">
-                <HomeOutlined rev="" style={{ fontSize: '30px' }} />
+                <HomeOutlined rev="" style={{ fontSize: '30px', top: '-2px', position: 'relative' }} />
               </a>
             </Link>
             {selectedCompanies.map((company) => (
@@ -298,12 +298,15 @@ export default function Navbar() {
       )}
 
       <Sider
+        trigger={showSidebar ? <MenuOutlined className="font-size-9" rev /> : <CloseOutlined className="font-size-9" rev />}
         className={styles.navbarSidebar}
         collapsible={!cartIsOpen}
         collapsedWidth={0}
         collapsed={showSidebar}
         onCollapse={(value) => setHideSidebar(value)}
-        zeroWidthTriggerStyle={{ top: '150px' }}
+        zeroWidthTriggerStyle={{
+          top: '-50px', zIndex: 100, left: '5px', border: 'none', fontSize: '21px',
+        }}
         theme="light"
       >
         {!showSidebar
@@ -311,6 +314,7 @@ export default function Navbar() {
             <>
               <div className="demo-logo-vertical" />
               <Menu
+                style={{ height: '100dvh' }}
                 theme="light"
                 defaultSelectedKeys={['1']}
                 mode="inline"

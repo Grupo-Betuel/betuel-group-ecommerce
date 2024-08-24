@@ -73,4 +73,8 @@ $flexAlignments: (
     align-items: $alignment;
     flex-direction: column;
   }
+
+  .align-self-#{$name} {
+    align-self: $alignment;
+  }
 }

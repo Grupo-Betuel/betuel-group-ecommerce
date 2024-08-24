@@ -51,4 +51,11 @@ export const getSaleDataFromProduct = (
   company: product.company,
   unitPrice: product.price,
   unitCost: product.cost,
+  // params: [{
+  //   ...product.productParams[0],
+  //   productParams: product.productParams[0]._id,
+  //   quantity: 1,
+  //   price: product.price,
+  //   cost: product.cost,
+  // } as IProductSaleParam],
 });

@@ -1,14 +1,16 @@
 import dynamic from 'next/dynamic';
-import { Spin } from 'antd';
 import { handleEntityHook } from '@shared/hooks/handleEntityHook';
 import { IProductPerCategory } from '@shared/entities/ProductEntity';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, {
+  useEffect, useState, useMemo, useContext,
+} from 'react';
 import { useRouter } from 'next/router';
 import { EndpointsAndEntityStateKeys } from '@shared/enums/endpoints.enum';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import { useInfiniteScroll } from '@shared/hooks/useInfiniteScrollHook';
 import { useImageCache } from '@shared/contexts/ImageCacheContext';
+import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import styles from './Company.module.scss';
 
 const DynamicScrollView = dynamic(
@@ -56,7 +58,6 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
     },
   });
 
-  console.log('is last', isLastPage);
   const currentCompany: CompanyEntity = useMemo(
     () => currentCompanyRes?.data[0] || company || ({} as CompanyEntity),
     [currentCompanyRes?.data, company],
@@ -118,14 +119,14 @@ export function Company({ company, productsPerCategoryData }: CompanyProps) {
       });
     });
   }, [companyProducts]);
+  const { setAppLoading } = useContext(AppLoadingContext);
+
+  useEffect(() => {
+    setAppLoading(loadingProducts);
+  }, [loadingProducts]);
 
   return (
     <>
-      {loadingProducts && (
-        <div className="loading">
-          <Spin size="large" />
-        </div>
-      )}
       <div className={styles.CompanyWrapper}>
         {ProductDetail}
         <div className={styles.CompanyContent}>

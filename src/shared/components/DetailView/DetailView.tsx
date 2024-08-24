@@ -6,7 +6,7 @@ import {
   InputNumber,
   List, Modal,
   Space,
-  Spin,
+  Tooltip,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -21,7 +21,7 @@ import {
 import { useRouter } from 'next/router';
 import React, {
   createElement,
-  useCallback,
+  useCallback, useContext,
   useEffect,
   useMemo,
   useRef,
@@ -44,7 +44,7 @@ import { useOrderContext } from '@shared/contexts/OrderContext';
 import { useAppStore } from '@services/store';
 import { ProductsConstants } from '@shared/constants/products.constants';
 import Link from 'next/link';
-import { Icon } from '@iconify/react';
+import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { sidebarWidth } from '../../../utils/layout.utils';
 import styles from './DetailView.module.scss';
 import { getSaleDataFromProduct } from '../../../utils/objects.utils';
@@ -144,10 +144,14 @@ export function DetailView({
         });
       }
 
-      setSale({
+      const newSale = {
         ...getSaleDataFromProduct(product),
         ...savedSale,
-      });
+      };
+
+      setSale(newSale);
+
+      // orderService?.handleLocalOrderSales(newSale);
       // savedSale?.params.forEach((param) => handleSaleProductParams(param)());
     }
   }, [product, currentOrder]);
@@ -240,7 +244,7 @@ export function DetailView({
       value: productParam.value,
       type: productParam.type,
       productQuantity: productParam.quantity,
-      quantity: 0,
+      quantity: productParam.relatedParams?.length ? 0 : 1,
       productParam: productParam._id,
       ...saleParam,
       relatedParams,
@@ -250,26 +254,35 @@ export function DetailView({
   };
 
   const handleSaleProductParams = (productParam: IProductParam | IProductSaleParam) => () => {
+    let newSale = structuredClone(sale);
     const saleParam: any = (productParam as IProductSaleParam).productParam
       ? (productParam as IProductSaleParam)
       : ({} as IProductSaleParam);
 
     const param = parseProductParamToSaleParams(productParam as IProductParam, saleParam);
-    const exist = sale?.params?.find(
+    const exist = newSale?.params?.find(
       (p) => p.productParam === param.productParam,
     );
     let newParams: IProductSaleParam[] | undefined = [];
 
     // Only will deactivate it if quantity is 0
     if (exist && !exist.quantity) {
-      newParams = sale?.params?.filter(
+      newParams = newSale?.params?.filter(
         (p) => p.productParam !== param.productParam,
       );
-      setSale({ ...sale, params: newParams });
+      newSale = { ...newSale, params: newParams };
+      newSale.quantity = newSale.params?.reduce((acc, p) => acc + (p.quantity || 0), 0) || 0;
+      setSale(newSale);
     } else if (!exist) {
       newParams = [...(sale?.params || [])];
       newParams.push(param);
-      setSale({ ...sale, params: newParams });
+      newSale = { ...newSale, params: newParams };
+      newSale.quantity = newSale.params?.reduce((acc, p) => acc + (p.quantity || 0), 0) || 0;
+      setSale(newSale);
+    }
+
+    if (newSale.quantity) {
+      orderService?.handleLocalOrderSales(newSale);
     }
   };
 
@@ -371,31 +384,27 @@ export function DetailView({
         () => true,
         () => false,
       );
-
-    console.log('klk data', controlIsValid, saleTotal, quantity);
     if (controlIsValid) {
-      if (saleTotal > 0) {
-        if (quantity <= 0) {
-          newSale.params = newSale?.params?.map(
-            (item) => {
-              if (item.productParam === parentId) {
-                console.log(item.relatedParams, 'related');
-                if (item.relatedParams) {
-                  item.relatedParams = item.relatedParams.filter(
-                    (rp) => rp.productParam !== variantId,
-                  );
-                  return item;
-                }
-                return null;
+      // if (saleTotal > 0) {
+      if (quantity <= 0) {
+        newSale.params = newSale?.params?.map(
+          (item) => {
+            if (item.productParam === parentId) {
+              if (item.relatedParams?.length && variantId) {
+                item.relatedParams = item.relatedParams.filter(
+                  (rp) => rp.productParam !== variantId,
+                );
+                return item;
               }
-              return item;
-            },
-          ).filter((item) => !!item) as IProductSaleParam[];
-        }
-        // if the order exist just
-        if (productExistOnShoppingCart) {
-          orderService?.handleLocalOrderSales(newSale);
-        }
+              return null;
+            }
+            return item;
+          },
+        ).filter((item) => !!item) as IProductSaleParam[];
+      }
+
+      if (saleTotal > 0) {
+        orderService?.handleLocalOrderSales(newSale);
       }
 
       setSale({ ...newSale });
@@ -411,10 +420,10 @@ export function DetailView({
 
     if (variantId) {
       return (
-        param?.relatedParams?.find((v) => v._id === variantId)?.quantity || 0
+        param?.relatedParams?.find((v) => v._id === variantId)?.quantity || 1
       );
     }
-    return param?.quantity || 0;
+    return param?.quantity || 1;
   };
 
   const maxQuantityError = useCallback(
@@ -490,44 +499,6 @@ export function DetailView({
     </Button>
   );
 
-  // // Efecto para cargar los detalles del producto
-  // useEffect(() => {
-  //   if (productDetails) {
-  //     setProduct(productDetails);
-  //   }
-  // }, [productDetails]);
-
-  // Maneja la adición de parámetros de venta
-  const handleAddToSale = (saleParam: IProductSaleParam) => {
-    const exist = sale?.params?.find(
-      (p) => p.productParam === saleParam.productParam,
-    );
-
-    let newParams: IProductSaleParam[] | undefined = [];
-    if (exist) {
-      newParams = sale?.params?.map((p) => (p.productParam === saleParam.productParam ? saleParam : p));
-    } else {
-      newParams = [...(sale?.params || []), saleParam];
-    }
-
-    const saleTotal = newParams?.reduce((acc, p) => acc + (p.quantity || 0), 0);
-
-    setSale({ ...sale, params: newParams, quantity: saleTotal });
-  };
-
-  // Maneja la eliminación de parámetros de venta
-  // const handleRemoveFromSale = (parentId: string, variantId?: string) => {
-  //   const newParams = sale?.params?.filter(
-  //     (item) =>
-  //       item.productParam !== parentId ||
-  //       (variantId && item.relatedParams?.find((v) => v.productParam !== variantId))
-  //   );
-  //
-  //   const saleTotal = newParams?.reduce((acc, p) => acc + (p.quantity || 0), 0);
-  //
-  //   setSale({ ...sale, params: newParams, quantity: saleTotal });
-  // };
-
   const attemptRemoveSaleParam = (productSaleParam: IProductSaleParam) => () => {
     confirm({
       title: '¿Estas seguro de eliminar este producto?',
@@ -543,6 +514,12 @@ export function DetailView({
       },
     });
   };
+
+  const { setAppLoading } = useContext(AppLoadingContext);
+  useEffect(() => {
+    const val = fetching && !product._id;
+    setAppLoading(val);
+  }, [fetching, product._id]);
 
   return (
     <>
@@ -647,13 +624,16 @@ export function DetailView({
                           ) : (
                             ` - ${param.value}`
                           )}
+                          {saleParam?.quantity ? `(${saleParam.quantity})` : ''}
                         </Button>
                         {!!saleParam?.quantity && (
                         <div>
                           {' '}
-                          <Button size="large" danger color="red" type="text" onClick={attemptRemoveSaleParam(saleParam)}>
-                            <DeleteOutlined rev className="text-bold font-size-9" />
-                          </Button>
+                          <Tooltip title="Quitar">
+                            <Button size="large" danger color="red" type="text" onClick={attemptRemoveSaleParam(saleParam)}>
+                              <DeleteOutlined rev className="text-bold font-size-9" />
+                            </Button>
+                          </Tooltip>
                         </div>
                         )}
                       </div>
@@ -689,13 +669,13 @@ export function DetailView({
                               onWheel={(e) => e.currentTarget.blur()}
                               type="number"
                               className={
-                              styles.DetailViewPostDetailsContentOptionQuantity
-                            }
+                                styles.DetailViewPostDetailsContentOptionQuantity
+                              }
                               placeholder="Cantidad"
                               onChange={handleSaleProductParamsChange(param._id)}
                               value={getQuantityValue(param._id)}
-                              defaultValue={0}
-                              min={0}
+                              defaultValue={1}
+                              min={1}
                               addonAfter={(
                                 <CloseOutlined
                                   rev=""
@@ -734,7 +714,7 @@ export function DetailView({
                     onChange={handleSaleQuantity}
                     value={sale.quantity}
                     defaultValue={0}
-                    min={0}
+                    min={1}
                   />
                 </Form.Item>
               )}
@@ -843,11 +823,6 @@ export function DetailView({
           {ShoppingActionButton}
         </StickyFooter>
       </div>
-      {fetching && !product._id && (
-        <div className="loading">
-          <Spin size="large" />
-        </div>
-      )}
     </>
   );
 }
