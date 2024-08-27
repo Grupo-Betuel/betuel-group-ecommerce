@@ -103,3 +103,9 @@
     display: none !important;
   }
 }
+
+.navbarSidebarTrigger {
+  @include breakpoints.only-on(('s','l', 'm')) {
+    display: none !important;
+  }
+}

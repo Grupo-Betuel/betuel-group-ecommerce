@@ -298,7 +298,11 @@ export default function Navbar() {
       )}
 
       <Sider
-        trigger={showSidebar ? <MenuOutlined className="font-size-9" rev /> : <CloseOutlined className="font-size-9" rev />}
+        trigger={(
+          <div className={styles.navbarSidebarTrigger}>
+            {showSidebar ? <MenuOutlined className="font-size-9" rev /> : <CloseOutlined className="font-size-9" rev />}
+          </div>
+        )}
         className={styles.navbarSidebar}
         collapsible={!cartIsOpen}
         collapsedWidth={0}
