@@ -166,6 +166,10 @@ export const ProductOptionHandler: React.FC<IProductOptionFormProps> = ({
           className="m-0"
           name={addBtnControlName}
           label={<b>Cantidad</b>}
+          wrapperCol={{
+            flex: 'none',
+            style: { flex: 'none' },
+          }}
           rules={[
             {
               type: 'number',
