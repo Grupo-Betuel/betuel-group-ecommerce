@@ -1,7 +1,5 @@
 import Head from 'next/head';
-
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 
 export interface IMetadata {
   ogTitle?: string;
@@ -18,6 +16,7 @@ export interface IMetadata {
     type?: string;
   };
   title?: string;
+  twitterCard?: 'summary' | 'summary_large_image' | 'player'; // Añadir tipo de tarjeta de Twitter
 }
 
 export interface IMetaHeadersProps {
@@ -29,30 +28,24 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
   const image = metadata?.image;
 
   useEffect(() => {
-    const fetchImageDimensions = async () => {
-      if (image) {
-        try {
-          const response = await axios.get(
-            `https://api.imagekit.io/v1/files/metadata?url=${encodeURIComponent(image)}`,
-            {
-              auth: {
-                username: process.env.NEXT_PUBLIC_IMAGEKIT_PRIVATE_KEY || '',
-                password: '',
-              },
-            },
-          );
-          const { width, height } = response.data;
-          setDimensions({ width, height });
-        } catch (error) {
-          console.error('Error fetching image dimensions:', error);
-        }
-      }
-    };
-    fetchImageDimensions();
+    if (image) {
+      const img = new Image();
+      img.src = image;
+      img.onload = () => {
+        setDimensions({
+          width: img.width,
+          height: img.height,
+        });
+      };
+      img.onerror = (error) => {
+        console.error('Error loading image:', error);
+      };
+    }
   }, [image]);
 
   return (
     <Head>
+      {/* Open Graph Meta Tags */}
       <meta property="og:title" content={metadata?.ogTitle || ''} />
       <meta property="og:description" content={metadata?.description || ''} />
       <meta property="og:image" content={image} />
@@ -60,26 +53,36 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
       <meta property="og:image:height" content={dimensions.height || ''} />
       <meta property="og:image:alt" content={metadata?.ogTitle || ''} />
       <meta property="og:video" content={metadata?.video?.url || ''} />
-      {/* TWITTER TAGS */}
-      <meta property="twitter:title" content={metadata?.title || ''} />
-      <meta property="twitter:description" content={metadata?.description || ''} />
-      <meta property="twitter:image" content={image} />
-      <meta property="twitter:image:alt" content={metadata?.title || ''} />
-      <meta property="twitter:video" content={metadata?.video?.url || ''} />
       <meta property="og:video:secure_url" content={metadata?.video?.secureUrl || ''} />
       <meta property="og:video:type" content={metadata?.video?.type || ''} />
       <meta property="og:type" content={metadata?.type || ''} />
+
+      {/* Twitter Meta Tags */}
+      <meta name="twitter:card" content={metadata?.twitterCard || 'summary_large_image'} />
+      <meta name="twitter:title" content={metadata?.title || ''} />
+      <meta name="twitter:description" content={metadata?.description || ''} />
+      <meta name="twitter:image" content={image} />
+      <meta name="twitter:image:alt" content={metadata?.title || ''} />
+      {metadata?.video && (
+        <>
+          <meta name="twitter:player" content={metadata?.video?.url || ''} />
+          <meta name="twitter:player:width" content={dimensions.width || ''} />
+          <meta name="twitter:player:height" content={dimensions.height || ''} />
+        </>
+      )}
+
+      {/* General Meta Tags */}
       <title>{metadata?.title || ''}</title>
       <meta name="description" key="desc" content={metadata?.description || ''} />
       <meta name="keywords" content={metadata?.keywords || ''} />
       <meta charSet="utf-8" />
+      <link rel="canonical" href={metadata?.canonical} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: metadata?.jsonld || '',
         }}
       />
-      <link rel="canonical" href={metadata.canonical} />
     </Head>
   );
 };
