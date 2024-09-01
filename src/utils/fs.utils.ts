@@ -9,6 +9,7 @@ import { generateCategorySitemapXml, generateCompanySitemapXml, generateProductS
 import { BETUEL_GROUP_ECOMMERCE_URL } from './constants/url.constants';
 
 export const getProductSiteMapUrL = (product: ProductEntity) => `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/products/${product._id}.xml`;
+export const getCategorySiteMapUrL = (category: CategoryEntity) => `${BETUEL_GROUP_ECOMMERCE_URL}sitemaps/categories/${category._id}.xml`;
 export const getProductSitemapFilePath = (product: ProductEntity) => path.join(process.cwd(), 'public/sitemaps/products', `${product._id}.xml`);
 export const getCompanySitemapFilePath = (company: CompanyEntity) => path.join(process.cwd(), 'public/sitemaps/companies', `${company._id}.xml`);
 export const getCategorySitemapFilePath = (category: CategoryEntity) => path.join(process.cwd(), 'public/sitemaps/categories', `${category._id}.xml`);
@@ -76,7 +77,14 @@ export function saveCategorySitemap(category: CategoryEntity) {
   });
 }
 
+let SitemapUrlsGlobal: string[] = [];
+
+const saveSiteMapURLSGLOBAL = (urls: string[]) => {
+  SitemapUrlsGlobal = Array.from(new Set([...SitemapUrlsGlobal, ...urls]));
+};
+
 export const handleSitemapsOnRobotFile = (sitemapsUrls: string[]) => {
+  saveSiteMapURLSGLOBAL(sitemapsUrls);
   const initRobot = `# Allow all crawlers
 User-agent: *
 Allow: /
@@ -124,7 +132,7 @@ Sitemap: https://www.grupobetuel.store/sitemaps/companies/64b1fb876fa96313c2cf6d
 Sitemap: https://www.grupobetuel.store/sitemaps/companies/64ebe0aa43d62267fb0ecff6.xml
 Sitemap: https://www.grupobetuel.store/sitemaps/companies/64ec04e0014f86812d4ad9ab.xml`;
 
-  const robotContent = `${initRobot}\n\nSitemap: ${sitemapsUrls.join('\nSitemap: ')}`;
+  const robotContent = `${initRobot}\n\nSitemap: ${SitemapUrlsGlobal.join('\nSitemap: ')}`;
 
   fs.writeFile(robotsPath, robotContent, (err) => {
     if (err) {

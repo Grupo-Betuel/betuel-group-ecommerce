@@ -8,6 +8,12 @@ import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import axios from 'axios';
 import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
+import {
+  getCategorySitemapFilePath, getCategorySiteMapUrL,
+  getProductSiteMapUrL,
+  handleSitemapsOnRobotFile,
+  saveCategorySitemap,
+} from '../../../utils/fs.utils';
 
 export interface ICategoryProductsProps {
   metadata: IMetadata;
@@ -30,14 +36,26 @@ export default function CategoryProducts({ metadata, cachedResources }: ICategor
 export const getStaticPaths: GetStaticPaths<{ company: string, category: string }> = async () => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}api/categories`;
   const { data: categorySlugs } = await axios.get<CategoryEntity[]>(url);
-  // saveCategorySitemap(cat);
+  const categoriesSitemaps: string[] = [];
 
-  const categorySlugsPaths = categorySlugs.map((cat) => ({
-    params: {
-      category: cat.slug,
-      company: cat.company,
-    },
-  }));
+  const categorySlugsPaths = categorySlugs.map((cat) => {
+    if (process.env.NODE_ENV === 'production') {
+      saveCategorySitemap(cat);
+      categoriesSitemaps.push(getCategorySiteMapUrL(cat));
+    }
+
+    return ({
+      params: {
+        category: cat.slug,
+        company: cat.company,
+      },
+    });
+  });
+
+  if (process.env.NODE_ENV === 'production') {
+    // this will add all product sitemap to robots.txt
+    handleSitemapsOnRobotFile(categoriesSitemaps);
+  }
   return ({
     paths: categorySlugsPaths, // indicates that no page needs be created at build time
     fallback: true, // indicates the type of fallback
