@@ -158,31 +158,34 @@ export const getStaticProps: GetServerSideProps = async (context) => {
         ? `\n${generateProductDescriptionFromParams(product?.productParams)}\n`
         : ''
     }${currentCompany?.description || ''}`;
+    const props: IProductDetailsProps = {
+      currentCompany,
+      cachedResources: cachedProductResource,
+      metadata: {
+        product,
+        keywords,
+        title: `${product?.name} RD$${product?.price.toLocaleString()}${
+          product?.category?.title ? ` | ${product?.category?.title}` : ''
+        } | ${currentCompany?.title} ${currentCompany?.name}`,
+        ogTitle: `${product?.name} RD$${product?.price.toLocaleString()} | ${
+          product?.category?.title || currentCompany?.title
+        }`,
+        description,
+        image: product?.image || currentCompany?.logo || '',
+        type: 'article',
+        video: {
+          url: currentCompany?.video || '',
+          secureUrl: currentCompany?.video || '',
+          type: currentCompany?.video?.includes('mp4')
+            ? 'video/mp4'
+            : 'video/ogg',
+        },
+      },
+    };
+
     return {
       // revalidate: 60,
-      props: {
-        currentCompany,
-        cachedResources: cachedProductResource,
-        metadata: {
-          keywords,
-          title: `${product?.name} RD$${product?.price.toLocaleString()}${
-            product?.category?.title ? ` | ${product?.category?.title}` : ''
-          } | ${currentCompany?.title} ${currentCompany?.name}`,
-          ogTitle: `${product?.name} RD$${product?.price.toLocaleString()} | ${
-            product?.category?.title || currentCompany?.title
-          }`,
-          description,
-          image: product?.image || currentCompany?.logo || '',
-          type: 'article',
-          video: {
-            url: currentCompany?.video || '',
-            secureUrl: currentCompany?.video || '',
-            type: currentCompany?.video?.includes('mp4')
-              ? 'video/mp4'
-              : 'video/ogg',
-          },
-        },
-      } as IProductDetailsProps,
+      props,
     };
   } catch (error) {
     console.log('error while getting product products', error);

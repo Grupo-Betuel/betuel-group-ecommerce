@@ -9,8 +9,7 @@ import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import axios from 'axios';
 import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
 import {
-  getCategorySitemapFilePath, getCategorySiteMapUrL,
-  getProductSiteMapUrL,
+  getCategorySiteMapUrL,
   handleSitemapsOnRobotFile,
   saveCategorySitemap,
 } from '../../../utils/fs.utils';
