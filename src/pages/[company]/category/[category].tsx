@@ -1,13 +1,12 @@
 import { Category } from '@screens/Category';
 import { GetServerSideProps, GetStaticPaths } from 'next';
 // import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { IMetadata } from '@components/MetaHeaders/MetaHeaders';
 // import { CategoryEntity } from '@shared/entities/CategoryEntity';
 // import { getCachedResources } from '../../../utils/fs.utils';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import axios from 'axios';
-import { MetaHeadersNative } from '@components/MetaHeaders/MetaHeadersNative';
+import { IMetadataNative, MetaHeadersNative } from '@components/MetaHeaders/MetaHeadersNative';
 import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
 import {
   getCategorySiteMapUrL,
@@ -16,7 +15,7 @@ import {
 } from '../../../utils/fs.utils';
 
 export interface ICategoryProductsProps {
-  metadata: IMetadata;
+  metadata: IMetadataNative;
   cachedResources: ICachedResourceResponse<CategoryEntity>;
 }
 export default function CategoryProducts({ metadata, cachedResources }: ICategoryProductsProps) {

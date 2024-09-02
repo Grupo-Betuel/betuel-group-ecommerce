@@ -46,7 +46,7 @@ export const getStaticPaths: GetStaticPaths<{ company: string }> = async () => {
 
   return {
     paths: companyPaths,
-    fallback: true, // Indicates the type of fallback
+    fallback: 'blocking', // Indicates the type of fallback
   };
 };
 

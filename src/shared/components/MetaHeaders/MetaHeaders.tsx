@@ -1,9 +1,7 @@
 import { NextSeo, ProductJsonLd } from 'next-seo';
-import { useEffect, useState } from 'react';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
-import Head from 'next/head';
-import { NextSeoProps, OpenGraphMedia } from 'next-seo/lib/types';
+import { OpenGraphMedia } from 'next-seo/lib/types';
 import { getProductUrl } from '../../../utils/seo.utils';
 
 export interface IMetadata {

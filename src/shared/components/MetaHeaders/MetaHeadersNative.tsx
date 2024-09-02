@@ -1,7 +1,6 @@
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
 
-export interface IMetadata {
+export interface IMetadataNative {
   ogTitle?: string;
   description?: string;
   jsonld?: string;
@@ -20,7 +19,7 @@ export interface IMetadata {
 }
 
 export interface IMetaHeadersProps {
-  metadata: IMetadata;
+  metadata: IMetadataNative;
 }
 
 export const MetaHeadersNative = ({ metadata }: IMetaHeadersProps) => (
@@ -28,9 +27,9 @@ export const MetaHeadersNative = ({ metadata }: IMetaHeadersProps) => (
     {/* Open Graph Meta Tags */}
     <meta property="og:title" content={metadata?.ogTitle || ''} />
     <meta property="og:description" content={metadata?.description || ''} />
-    <meta property="og:image" content={image} />
-    <meta property="og:image:width" content={dimensions.width || '1200'} />
-    <meta property="og:image:height" content={dimensions.height || '630'} />
+    <meta property="og:image" content={metadata.image || 'https://www.grupobetuel.store/images/wallpaper.png'} />
+    {/* <meta property="og:image:width" content={dimensions.width || '1200'} /> */}
+    {/* <meta property="og:image:height" content={dimensions.height || '630'} /> */}
     <meta property="og:image:alt" content={metadata?.ogTitle || ''} />
     <meta property="og:video" content={metadata?.video?.url || ''} />
     <meta property="og:video:secure_url" content={metadata?.video?.secureUrl || ''} />
@@ -41,13 +40,18 @@ export const MetaHeadersNative = ({ metadata }: IMetaHeadersProps) => (
     <meta name="twitter:card" content={metadata?.twitterCard || 'summary'} />
     <meta name="twitter:title" content={metadata?.title || ''} />
     <meta name="twitter:description" content={metadata?.description || ''} />
-    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image" content={metadata.image || ''} />
     <meta name="twitter:image:alt" content={metadata?.title || ''} />
     {metadata?.video && (
     <>
-      <meta name="twitter:player" content={metadata?.video?.url || ''} />
-      {dimensions.width && <meta name="twitter:player:width" content={dimensions.width} />}
-      {dimensions.height && <meta name="twitter:player:height" content={dimensions.height} />}
+      <meta
+        name="twitter:player"
+        content={metadata?.video?.url || 'https://www.grupobetuel.store/images/wallpaper.png'}
+      />
+      {/* {dimensions.width && <meta name="twitter:player:width" content={dimensions.width} />} */}
+      {/* {dimensions.height && <meta
+      name="twitter:player:height" content={dimensions.height} />}
+      */}
     </>
     )}
 
