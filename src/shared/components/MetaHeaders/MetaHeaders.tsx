@@ -2,6 +2,7 @@ import { NextSeo, ProductJsonLd } from 'next-seo';
 import { useEffect, useState } from 'react';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
+import Head from 'next/head';
 import { getProductUrl } from '../../../utils/seo.utils';
 
 export interface IMetadata {
@@ -53,7 +54,7 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
   }, [image]);
 
   return (
-    <>
+    <Head>
       <NextSeo
         title={metadata?.title || 'Producto'}
         description={metadata?.description || 'Default description'}
@@ -118,6 +119,6 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
           ]}
         />
       )}
-    </>
+    </Head>
   );
 };

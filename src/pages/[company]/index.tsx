@@ -1,9 +1,9 @@
 import { Company } from 'src/screens/Company';
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import axios from 'axios';
+import { MetaHeadersNative } from '@components/MetaHeaders/MetaHeadersNative';
 import { handleCachedCompany } from '../../utils/server-side.utils';
 import { saveCompanySitemap } from '../../utils/fs.utils';
 
@@ -15,7 +15,7 @@ export default function CompanyProducts({
   const { sitemapURL, jsonld, canonical } = handleCachedResourceHook(cachedResources);
   return (
     <>
-      <MetaHeaders
+      <MetaHeadersNative
         metadata={{
           ...metadata,
           jsonld,

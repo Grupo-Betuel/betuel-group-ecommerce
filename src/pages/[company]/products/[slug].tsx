@@ -1,11 +1,11 @@
 import { DetailView } from '@components/DetailView';
 import { GetServerSideProps, GetStaticPaths } from 'next';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
+import { IMetadata } from '@components/MetaHeaders/MetaHeaders';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
-// import { getCachedResources } from '../../../utils/fs.utils';
 import axios from 'axios';
+import { MetaHeadersNative } from '@components/MetaHeaders/MetaHeadersNative';
 import {
   handleCachedCompany,
   handleCachedProduct,
@@ -32,7 +32,7 @@ export default function ProductDetail({
   const { sitemapURL, jsonld, canonical } = handleCachedResourceHook(cachedResources);
   return (
     <div>
-      <MetaHeaders
+      <MetaHeadersNative
         metadata={{
           ...metadata,
           jsonld,

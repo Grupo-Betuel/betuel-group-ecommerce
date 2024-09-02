@@ -23,7 +23,7 @@ export interface IMetaHeadersProps {
   metadata: IMetadata;
 }
 
-export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
+export const MetaHeadersNative = ({ metadata }: IMetaHeadersProps) => {
   const [dimensions, setDimensions] = useState<
   { width: string | null, height: string | null }>(
     { width: null, height: null },
@@ -61,7 +61,7 @@ export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
       <meta property="og:type" content={metadata?.type || ''} />
 
       {/* Twitter Meta Tags */}
-      <meta name="twitter:card" content={metadata?.twitterCard || 'summary_large_image'} />
+      <meta name="twitter:card" content={metadata?.twitterCard || 'summary'} />
       <meta name="twitter:title" content={metadata?.title || ''} />
       <meta name="twitter:description" content={metadata?.description || ''} />
       <meta name="twitter:image" content={image} />
