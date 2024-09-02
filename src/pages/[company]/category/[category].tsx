@@ -1,34 +1,26 @@
 import { Category } from '@screens/Category';
 import { GetServerSideProps, GetStaticPaths } from 'next';
-// import { CompanyEntity } from '@shared/entities/CompanyEntity';
-// import { CategoryEntity } from '@shared/entities/CategoryEntity';
-// import { getCachedResources } from '../../../utils/fs.utils';
-import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import axios from 'axios';
-import { IMetadataNative, MetaHeadersNative } from '@components/MetaHeaders/MetaHeadersNative';
+import { IMetadataNative } from '@components/MetaHeaders/MetaHeadersNative';
+import { IMetadata } from '@components/MetaHeaders/MetaHeaders';
+import { ISSGPageProps } from '@interfaces/page.interface';
 import { handleCachedCategories, handleCachedCompany, ICachedResourceResponse } from '../../../utils/server-side.utils';
 import {
   getCategorySiteMapUrL,
   handleSitemapsOnRobotFile,
   saveCategorySitemap,
 } from '../../../utils/fs.utils';
+import { getImageDimensionsFromUrl } from '../../../utils/image.utils';
 
 export interface ICategoryProductsProps {
   metadata: IMetadataNative;
   cachedResources: ICachedResourceResponse<CategoryEntity>;
 }
-export default function CategoryProducts({ metadata, cachedResources }: ICategoryProductsProps) {
-  const { sitemapURL, jsonld, canonical } = handleCachedResourceHook(cachedResources);
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function CategoryProducts(_props: ICategoryProductsProps) {
   return (
-    <>
-      <MetaHeadersNative metadata={{
-        ...metadata, jsonld, sitemapURL, canonical,
-      }}
-      />
-      <Category />
-    </>
+    <Category />
   );
 }
 
@@ -87,26 +79,34 @@ export const getStaticProps: GetServerSideProps = async (context) => {
   const currentCategory = cachedResources.data;
   // }
   const keywords = `${currentCategory?.tags?.join(', ') || ''} ${currentCompany?.tags?.join(', ') || ''}`;
+  const imageUrl = currentCategory?.wallpaper || currentCompany?.wallpaper || currentCompany?.logo || '';
+  const dimensions = await getImageDimensionsFromUrl(imageUrl);
+  const image: IMetadata['image'] = {
+    ...dimensions,
+    url: imageUrl,
+  };
+
+  const props: ISSGPageProps = {
+    cachedResources,
+    metadata: {
+      image,
+      keywords,
+      title: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
+      ogTitle: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
+      description:
+          currentCategory?.description || currentCompany?.description || '',
+      type: 'website',
+      video: {
+        url: currentCategory?.video || currentCompany?.video || '',
+        secureUrl: currentCategory?.video || currentCompany?.video || '',
+        type: (currentCategory?.video || currentCompany?.video || '').includes('mp4')
+          ? 'video/mp4'
+          : 'video/ogg',
+      },
+    },
+  };
 
   return {
-    props: {
-      cachedResources,
-      metadata: {
-        keywords,
-        title: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
-        ogTitle: `${currentCategory?.title} | ${currentCompany?.name} ${currentCompany?.title}`,
-        description:
-          currentCategory?.description || currentCompany?.description || '',
-        image: currentCategory?.wallpaper || currentCompany?.wallpaper || currentCompany?.logo || '',
-        type: 'website',
-        video: {
-          url: currentCategory?.video || currentCompany?.video || '',
-          secureUrl: currentCategory?.video || currentCompany?.video || '',
-          type: (currentCategory?.video || currentCompany?.video || '').includes('mp4')
-            ? 'video/mp4'
-            : 'video/ogg',
-        },
-      },
-    } as ICategoryProductsProps,
+    props,
   };
 };

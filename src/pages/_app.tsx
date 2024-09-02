@@ -14,6 +14,7 @@ import { useAuthClientHook } from '@shared/hooks/useAuthClientHook';
 import { handleLoginHook } from '@shared/hooks/handleLoginHook';
 import { FROM_TARGET_KEY } from '@shared/constants/seo.constants';
 import { useRouter } from 'next/router';
+import { MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 import Head from 'next/head';
 import Link from 'next/link';
 import LoadingBar from 'react-top-loading-bar';
@@ -131,7 +132,11 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
       />
     );
   }
-
+  console.log('pageProps', pageProps);
+  const {
+    metadata,
+    cachedResources,
+  } = pageProps as any;
   return (
     <>
       <Head>
@@ -163,7 +168,15 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
         <meta property="og:locale" content="es_ES" />
         <meta property="fb:app_id" content="1304512236864343" />
       </Head>
-
+      <MetaHeaders metadata={
+        {
+          ...metadata,
+          jsonld: cachedResources?.jsonld,
+          sitemapURL: cachedResources?.sitemapURL,
+          canonical: cachedResources?.canonical,
+        }
+      }
+      />
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
         {/* {appLoading && ( */}
         {/*   <div className="loading"> */}

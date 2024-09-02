@@ -1,15 +1,13 @@
 import { DetailView } from '@components/DetailView';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
+import { IMetadata } from '@components/MetaHeaders/MetaHeaders';
 import { ProductEntity } from '@shared/entities/ProductEntity';
-import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 import axios from 'axios';
-import sizeOf from 'image-size';
+import { ISSGPageProps } from '@interfaces/page.interface';
 import {
   handleCachedCompany,
   handleCachedProduct,
-  ICachedResourceResponse,
 } from '../../../utils/server-side.utils';
 import {
   getProductSiteMapUrL,
@@ -17,35 +15,18 @@ import {
   saveProductSitemap,
 } from '../../../utils/fs.utils';
 import { generateProductDescriptionFromParams } from '../../../utils/params.utils';
-
-export interface IProductDetailsProps {
-  metadata: IMetadata;
-  currentCompany?: CompanyEntity;
-  cachedResources: ICachedResourceResponse<ProductEntity>;
-}
+import { getImageDimensionsFromUrl } from '../../../utils/image.utils';
 
 export default function ProductDetail({
-  metadata,
   currentCompany,
   cachedResources,
-}: IProductDetailsProps) {
-  const { sitemapURL, jsonld, canonical } = handleCachedResourceHook(cachedResources);
+}: ISSGPageProps) {
   return (
-    <div>
-      <MetaHeaders
-        metadata={{
-          ...metadata,
-          jsonld,
-          sitemapURL,
-          canonical,
-        }}
-      />
-      <DetailView
-        companyLogo={currentCompany?.logo}
-        productDetails={cachedResources?.data}
-        forceLoadProduct
-      />
-    </div>
+    <DetailView
+      companyLogo={currentCompany?.logo}
+      productDetails={cachedResources?.data}
+      forceLoadProduct
+    />
   );
 }
 export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
@@ -128,13 +109,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
         : ''
     }${currentCompany?.description || ''}`;
     const imageUrl = product?.image || currentCompany?.logo || '';
-    const dimensions = await getImageDimensions(imageUrl);
+    const dimensions = await getImageDimensionsFromUrl(imageUrl);
     const image: IMetadata['image'] = {
       ...dimensions,
       url: imageUrl,
 
     };
-    const props: IProductDetailsProps = {
+    const props: ISSGPageProps = {
       currentCompany,
       cachedResources: cachedProductResource,
       metadata: {
@@ -166,22 +147,5 @@ export const getStaticProps: GetStaticProps = async (context) => {
   } catch (error) {
     console.log('error while getting product products', error);
     throw error;
-  }
-};
-
-const getImageDimensions = async (url: string) => {
-  try {
-    const { data } = await axios.get(url, { responseType: 'arraybuffer' });
-    const dimensions = sizeOf(data);
-    return {
-      width: dimensions.width || 1200,
-      height: dimensions.height || 630,
-    };
-  } catch (error) {
-    console.error('Error getting image dimensions:', error);
-    return {
-      width: 1200,
-      height: 630,
-    };
   }
 };
