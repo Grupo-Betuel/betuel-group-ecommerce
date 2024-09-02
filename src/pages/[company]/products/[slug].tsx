@@ -1,11 +1,11 @@
 import { DetailView } from '@components/DetailView';
 import { GetServerSideProps, GetStaticPaths } from 'next';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
-import { IMetadata } from '@components/MetaHeaders/MetaHeaders';
+import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { handleCachedResourceHook } from '@shared/hooks/handleCachedResourceHook';
 import axios from 'axios';
-import { MetaHeadersNative } from '@components/MetaHeaders/MetaHeadersNative';
+import sizeOf from 'image-size';
 import {
   handleCachedCompany,
   handleCachedProduct,
@@ -32,7 +32,7 @@ export default function ProductDetail({
   const { sitemapURL, jsonld, canonical } = handleCachedResourceHook(cachedResources);
   return (
     <div>
-      <MetaHeadersNative
+      <MetaHeaders
         metadata={{
           ...metadata,
           jsonld,
@@ -92,6 +92,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
     }),
   );
 
+  // console.log('allProductSlugs', allProductSlugs);
   // Reading a file
   // fs.readFile(filePath, 'utf8', (err, data) => {
   //   if (err) {
@@ -113,7 +114,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 
   return {
     paths: allProductSlugs, // indicates that no page needs be created at build time
-    fallback: true, // indicates the type of fallback
+    fallback: 'blocking', // indicates the type of fallback
   };
 };
 
@@ -158,6 +159,13 @@ export const getStaticProps: GetServerSideProps = async (context) => {
         ? `\n${generateProductDescriptionFromParams(product?.productParams)}\n`
         : ''
     }${currentCompany?.description || ''}`;
+    const imageUrl = product?.image || currentCompany?.logo || '';
+    const dimensions = await getImageDimensions(imageUrl);
+    const image: IMetadata['image'] = {
+      ...dimensions,
+      url: imageUrl,
+
+    };
     const props: IProductDetailsProps = {
       currentCompany,
       cachedResources: cachedProductResource,
@@ -171,7 +179,7 @@ export const getStaticProps: GetServerSideProps = async (context) => {
           product?.category?.title || currentCompany?.title
         }`,
         description,
-        image: product?.image || currentCompany?.logo || '',
+        image,
         type: 'article',
         video: {
           url: currentCompany?.video || '',
@@ -190,5 +198,22 @@ export const getStaticProps: GetServerSideProps = async (context) => {
   } catch (error) {
     console.log('error while getting product products', error);
     throw error;
+  }
+};
+
+const getImageDimensions = async (url: string) => {
+  try {
+    const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+    const dimensions = sizeOf(data);
+    return {
+      width: dimensions.width || 1200,
+      height: dimensions.height || 630,
+    };
+  } catch (error) {
+    console.error('Error getting image dimensions:', error);
+    return {
+      width: 1200,
+      height: 630,
+    };
   }
 };
