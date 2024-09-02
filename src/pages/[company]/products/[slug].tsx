@@ -60,16 +60,6 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
       const url = `${process.env.NEXT_PUBLIC_API_URL}api/products/slugs/${company.companyId}`;
       const { data: productSlugs } = await axios.get<ProductEntity[]>(url);
       const productSlugsPaths = productSlugs.map((product) => {
-        // const productSitemapPath = path.join(
-        // process.cwd(), 'public/sitemaps/products', `${product._id}.xml`);
-        // const productSitemapContent = generateProductSitemapXML(product);
-        // fs.writeFile(productSitemapPath, productSitemapContent, (err) => {
-        //   if (err) {
-        //     console.error(`Error writing to file ${productSitemapPath}:`, err);
-        //   } else {
-        //     console.log(`File ${productSitemapPath} has been written.`);
-        //   }
-        // });
         if (process.env.NODE_ENV === 'production') {
           saveProductSitemap(product);
           productSitemaps.push(getProductSiteMapUrL(product));
@@ -84,34 +74,12 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
       });
 
       if (process.env.NODE_ENV === 'production') {
-        // this will add all product sitemap to robots.txt
         handleSitemapsOnRobotFile(productSitemaps);
       }
 
       allProductSlugs = [...allProductSlugs, ...productSlugsPaths];
     }),
   );
-
-  // console.log('allProductSlugs', allProductSlugs);
-  // Reading a file
-  // fs.readFile(filePath, 'utf8', (err, data) => {
-  //   if (err) {
-  //     console.error(`Error reading file ${filePath}:`, err);
-  //   } else {
-  //     console.log(`File content for ${filePath}:`, data);
-  //   }
-  // });
-
-  // Writing to a file
-  // const contentToWrite = 'This is a sample content.';
-  // fs.writeFile(filePath, contentToWrite, (err) => {
-  //   if (err) {
-  //     console.error(`Error writing to file ${filePath}:`, err);
-  //   } else {
-  //     console.log(`File ${filePath} has been written.`);
-  //   }
-  // });
-
   return {
     paths: allProductSlugs, // indicates that no page needs be created at build time
     fallback: 'blocking', // indicates the type of fallback
@@ -192,7 +160,7 @@ export const getStaticProps: GetServerSideProps = async (context) => {
     };
 
     return {
-      // revalidate: 60,
+      revalidate: 60,
       props,
     };
   } catch (error) {
