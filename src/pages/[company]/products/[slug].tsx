@@ -1,5 +1,5 @@
 import { DetailView } from '@components/DetailView';
-import { GetServerSideProps, GetStaticPaths } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import { CompanyEntity } from '@shared/entities/CompanyEntity';
 import { IMetadata, MetaHeaders } from '@components/MetaHeaders/MetaHeaders';
 import { ProductEntity } from '@shared/entities/ProductEntity';
@@ -86,7 +86,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   };
 };
 
-export const getStaticProps: GetServerSideProps = async (context) => {
+export const getStaticProps: GetStaticProps = async (context) => {
   try {
     /// / HANDLING PRODUCT DATA
     const productSlug = context.params?.slug as string;
