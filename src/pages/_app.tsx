@@ -50,7 +50,7 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
   const router = useRouter();
   const { login } = handleLoginHook();
   const [companyId, setCompanyId] = useState<string>('');
-  const [seoUrl, setSeoUrl] = useState<string>('');
+  // const [seoUrl, setSeoUrl] = useState<string>('');
 
   const toggleShoppingCart = () => setCartIsOpen(!cartIsOpen);
 
@@ -59,7 +59,7 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
     if (companyName !== companyId) {
       setCompanyId(companyName + (companyName ? '/' : ''));
     }
-    setSeoUrl(location.href);
+    // setSeoUrl(location.href);
   }, [router.pathname]);
 
   const handleQueryParams = async () => {
