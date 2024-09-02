@@ -7,6 +7,6 @@ import { ICachedResourceResponse } from '../../utils/server-side.utils';
 export interface ISSGPageProps {
   metadata: IMetadata;
   currentCompany?: CompanyEntity;
-  cachedResources: ICachedResourceResponse<ProductEntity | CompanyEntity | CategoryEntity>;
-  productsPerCategory?: IProductPerCategory[];
+  cachedResources?: ICachedResourceResponse<ProductEntity | CompanyEntity | CategoryEntity>;
+  productsPerCategory?: IProductPerCategory[] | null;
 }

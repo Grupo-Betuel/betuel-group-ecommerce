@@ -53,7 +53,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 
   const props: ISSGPageProps = {
-    productsPerCategory: productsPerCategory || undefined,
+    productsPerCategory: productsPerCategory || null,
     cachedResources,
     metadata: {
       image,

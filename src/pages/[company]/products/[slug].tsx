@@ -62,8 +62,8 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
     }),
   );
   return {
-    paths: allProductSlugs, // indicates that no page needs be created at build time
-    fallback: 'blocking', // indicates the type of fallback
+    paths: allProductSlugs,
+    fallback: 'blocking',
   };
 };
 
@@ -71,34 +71,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     /// / HANDLING PRODUCT DATA
     const productSlug = context.params?.slug as string;
-    // let product: ProductEntity | undefined = await getCachedResources<ProductEntity>(
-    // productSlug as string,
-    // 'products');
-    //
-    // if (product) {
-    //   handleCachedProduct(productSlug as string);
-    // } else {
     const cachedProductResource = await handleCachedProduct(
       productSlug as string,
     );
     const product = cachedProductResource.data;
-    // }
 
     /// / HANDLING COMPANY DATA
     const companyName = context.params?.company;
-    // let currentCompany: CompanyEntity | undefined = await getCachedResources<CompanyEntity>(
-    // companyName as string,
-    // 'companies');
-
-    // if (currentCompany) {
-    //   handleCachedCompany(companyName as string);
-    // } else {
 
     const cachedCompanyResource = await handleCachedCompany(
       companyName as string,
     );
     const { data: currentCompany } = cachedCompanyResource;
-    // }
 
     const keywords = `${product?.tags?.join(', ') || ''} ${
       currentCompany?.tags?.join(', ') || ''
@@ -141,7 +125,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     };
 
     return {
-      revalidate: 60,
+      revalidate: 150,
       props,
     };
   } catch (error) {

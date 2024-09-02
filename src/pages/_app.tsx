@@ -132,7 +132,6 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
       />
     );
   }
-  console.log('pageProps', pageProps);
   const {
     metadata,
     cachedResources,
@@ -178,12 +177,6 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
       }
       />
       <ConfigProvider form={{ validateMessages }} theme={defaultTheme}>
-        {/* {appLoading && ( */}
-        {/*   <div className="loading"> */}
-        {/*     <Spin size="large" /> */}
-        {/*   </div> */}
-
-        {/* )} */}
         <ImageCacheProvider>
           <AppLoadingContext.Provider value={{ appLoading, setAppLoading }}>
             <OrderContext.Provider

@@ -1,8 +1,8 @@
-import { NextSeo, ProductJsonLd } from 'next-seo';
+import { NextSeo } from 'next-seo';
 import { ProductEntity } from '@shared/entities/ProductEntity';
 import { CategoryEntity } from '@shared/entities/CategoryEntity';
 import { OpenGraphMedia } from 'next-seo/lib/types';
-import { getProductUrl } from '../../../utils/seo.utils';
+import Head from 'next/head';
 
 export interface IMetadata {
   ogTitle?: string;
@@ -28,74 +28,95 @@ export interface IMetaHeadersProps {
   metadata: IMetadata;
 }
 
-export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => (
-  <>
-    <NextSeo
-      title={metadata?.title || 'Producto'}
-      description={metadata?.description || 'Default description'}
-      canonical={metadata?.canonical}
-      openGraph={{
-        type: metadata?.type || 'website',
-        url: metadata?.canonical,
-        title: metadata?.ogTitle || metadata?.title || 'Default OG Title',
-        description: metadata?.description || 'Default OG Description',
-        images: [
-          {
-            ...(metadata.image || {
-              url: 'https://www.grupobetuel.store/images/wallpaper.png',
-              width: 1200,
-              height: 630,
-            }),
-            // url: metadata.image?.url || 'https://www.example.com/default-image.jpg',
-            // width: metadata.image?.width || 1200,
-            // height: dimensions.height || 630,
-            alt: metadata?.ogTitle || 'Default Image Alt Text',
-          },
-        ],
-        videos: (metadata?.video
-          ? [
+const defaultMetadata: IMetadata = {
+  image: {
+    url: 'https://storage.googleapis.com/betuel-tech-photos/betueldance-wallpaper-1725296548339.png',
+    width: 800,
+    height: 392,
+    alt: 'Grupo Betuel',
+  },
+  keywords: 'Tienda de Danza, Tecnologia, Ropa de Bebes, Variedades',
+  title: 'Grupo Betuel Ecommerce | Tienda Virtual',
+  description: 'Toda clase de articulos de danza, electronica, ropa de bebes entre otros',
+  type: 'website',
+  video: {
+    url: '/images/video.mp4',
+    secureUrl: '/images/video.mp4',
+    type: 'video/mp4',
+  },
+};
+
+export const MetaHeaders = ({ metadata }: IMetaHeadersProps) => {
+  metadata = {
+    ...defaultMetadata,
+    ...metadata,
+  };
+  console.log(metadata, 'metadatos');
+  return (
+    <>
+      <NextSeo
+        title={metadata?.title || ''}
+        description={metadata?.description || ''}
+        canonical={metadata?.canonical}
+        openGraph={{
+          type: metadata?.type || 'website',
+          url: metadata?.canonical,
+          title: metadata?.ogTitle || metadata?.title || '',
+          description: metadata?.description || '',
+          images: [
             {
-              url: metadata?.video.url,
-              secureUrl: metadata?.video.secureUrl,
-              type: metadata?.video.type,
+              ...(metadata.image || {} as any),
+              alt: metadata?.ogTitle || 'Grupo Betuel',
             },
-          ]
-          : []) as any,
-      }}
-      twitter={{
-        cardType: metadata?.twitterCard || 'summary',
-        // title: metadata?.title || 'Default Twitter Title',
-        // description: metadata?.description || 'Default Twitter Description',
-        // image: image || 'https://www.example.com/default-image.jpg',
-        // imageAlt: metadata?.title || 'Default Twitter Image Alt Text',
-        // player: metadata?.video?.url,
-        // playerWidth: dimensions.width,
-        // playerHeight: dimensions.height,
-      }}
-      additionalMetaTags={[
-        {
-          name: 'keywords',
-          content: metadata?.keywords || 'default, keywords, here',
-        },
-      ]}
-    />
-    {metadata?.product && (
-      <ProductJsonLd
-        productName={metadata.product.name}
-        images={metadata.product.images}
-        description={metadata.product.description}
-        category={metadata.product.category?.title}
-          // brand={metadata.product.brand}
-        sku={metadata.product.shortID}
-        offers={[
+          ],
+          videos: (metadata?.video
+            ? [
+              {
+                url: metadata?.video.url,
+                secureUrl: metadata?.video.secureUrl,
+                type: metadata?.video.type,
+              },
+            ]
+            : []) as any,
+        }}
+        twitter={{
+          cardType: metadata?.twitterCard || 'summary_large_image',
+        }}
+        additionalMetaTags={[
           {
-            price: metadata.product.price,
-            priceCurrency: 'DOP',
-            url: getProductUrl(metadata.product),
-            availability: 'https://schema.org/InStock',
+            name: 'keywords',
+            content: metadata?.keywords || 'default, keywords, here',
           },
         ]}
       />
-    )}
-  </>
-);
+      {metadata?.product && (
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: metadata?.jsonld || '',
+          }}
+        />
+      </Head>
+      )}
+      {/* {metadata?.product && ( */}
+      {/* <ProductJsonLd */}
+      {/*   productName={metadata.product.name} */}
+      {/*   images={metadata.product.images} */}
+      {/*   description={metadata.product.description} */}
+      {/*   category={metadata.product.category?.title} */}
+      {/*     // brand={metadata.product.brand} */}
+      {/*   sku={metadata.product.shortID} */}
+      {/*   offers={[ */}
+      {/*     { */}
+      {/*       price: metadata.product.price, */}
+      {/*       priceCurrency: 'DOP', */}
+      {/*       url: getProductUrl(metadata.product), */}
+      {/*       availability: 'https://schema.org/InStock', */}
+      {/*     }, */}
+      {/*   ]} */}
+      {/* /> */}
+      {/* )} */}
+    </>
+  );
+};

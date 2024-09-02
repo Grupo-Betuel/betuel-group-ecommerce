@@ -10,7 +10,6 @@ import { AppLoadingContext } from '@shared/contexts/AppLoadingContext';
 import { showProductDetailsHook } from '@shared/hooks/showProductDetailsHook';
 import dynamic from 'next/dynamic';
 import { useImageCache } from '@shared/contexts/ImageCacheContext';
-import { NextSeo } from 'next-seo';
 import styles from './Home.module.scss';
 
 const DynamicScrollView = dynamic(() => import('@shared/components').then((mod) => mod.ScrollView), { ssr: false });
@@ -84,15 +83,14 @@ export function Home({}: HomeProps) {
     companyIds,
   ]);
 
-  const { cacheImage } = useImageCache(); // Add this line to get cacheImage function
-  //
+  const { cacheImage } = useImageCache();
+
   useEffect(() => {
     products.forEach((product) => {
-      cacheImage(product.image); // Cache each product's image
+      cacheImage(product.image);
     });
   }, [products, cacheImage]);
 
-  // cache products per company images
   useEffect(() => {
     productsPerCompanies?.data
       && Object.values(productsPerCompanies.data).forEach((company: any) => {
@@ -104,54 +102,6 @@ export function Home({}: HomeProps) {
 
   return (
     <div className={styles.HomeWrapper}>
-      <NextSeo
-        title="Grupo Betuel Ecommerce | Tienda Virtual"
-        description="Toda clase de articulos de danza, electronica, ropa de bebes entre otros"
-        canonical="https://www.grupobetuel.com/" // Reemplaza con tu URL canónica real
-        openGraph={{
-          url: 'https://www.grupobetuel.com/', // Reemplaza con la URL real de la página
-          title: 'Tienda Virtual de Grupo Betuel',
-          description: 'Todo tipo de accesorios',
-          images: [
-            {
-              url: '/images/wallpaper.png',
-              width: 1200,
-              height: 630,
-              alt: 'Grupo Betuel',
-            },
-          ],
-          type: 'website',
-          videos: [
-            {
-              url: '/images/video.mp4',
-              secureUrl: '/images/video.mp4',
-              type: 'video/mp4',
-              width: 1200,
-              height: 720,
-            },
-          ],
-        }}
-        twitter={{
-          cardType: 'summary_large_image',
-          // site: '@example_handle',
-          // title: 'Grupo Betuel Ecommerce',
-          // description: 'Toda clase de articulos',
-          // image: '/images/wallpaper.png',
-        }}
-      />
-      {/* <Head> */}
-      {/*   <meta property="og:title" content="Tienda Virtual de Grupo Betuel" /> */}
-      {/*   <meta property="og:description" content="Todo tipo de acccesorios" /> */}
-      {/*   <meta property="og:type" content="website" /> */}
-      {/*   <title>Grupo Betuel Ecommerce | Tienda Virtual</title> */}
-      {/*   <meta name="description" content="Toda clase de articulos" /> */}
-      {/*   <meta property="og:type" content="website" /> */}
-      {/*   <meta property="og:image" content="/images/wallpaper.png" /> */}
-      {/*   <meta property="og:video" content="/images/video.mp4" /> */}
-      {/*   <meta property="og:video:secure_url" content="/images/video.mp4" /> */}
-      {/*   <meta property="og:video:type" content="video/mp4" /> */}
-      {/*   <meta charSet="utf-8" /> */}
-      {/* </Head> */}
       {ProductDetail}
       <div className={styles.HomeContent}>
         {companyIds.length > 0 && (
