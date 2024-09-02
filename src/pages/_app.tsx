@@ -161,7 +161,6 @@ const MyApp = ({ Component, pageProps }: AppProps<IAppProps>) => {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:locale" content="es_ES" />
-        <meta property="og:url" content={seoUrl} />
         <meta property="fb:app_id" content="1304512236864343" />
       </Head>
 
